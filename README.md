@@ -103,9 +103,7 @@ Route::get('/alert',function(){
     return redirect()->route('home')->with('info','You have signed up!');
 });
 ``` 
-and refresh the page http://localhost:8000/alert
-
-and how you should see you alert message 
+Refresh the page http://localhost:8000/alert and how you should see you alert message 
 ```
 You have signed up!
 ```
