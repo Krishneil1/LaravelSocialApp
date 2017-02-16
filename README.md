@@ -81,3 +81,31 @@ Inside partials create a file. naviagtion.blade.php
     </div>
   </div>
 </nav>
+
+###Alert Message
+
+This will provide simple alerts for example when the use signs up our social net work.
+create a new file inside partials and name id alerts.blade.php.
+```
+@if(Session::has('info'))
+    <div class="alert alert-info" role="alert">
+    {{Session::get('info')}}
+    </div>
+@endif
+``
+Add the following code in you default page 
+```
+@include('templates.partials.alerts')
+```
+For simple test you can place the following route
+```
+Route::get('/alert',function(){
+    return redirect()->route('home')->with('info','You have signed up!');
+});
+``` 
+and refresh the page http://localhost:8000/alert
+
+and how you should see you alert message 
+```
+You have signed up!
+```
