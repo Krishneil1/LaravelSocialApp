@@ -81,7 +81,7 @@ Inside partials create a file. naviagtion.blade.php
     </div>
   </div>
 </nav>
-
+```
 ###Alert Message
 
 This will provide simple alerts for example when the use signs up our social net work.
