@@ -92,7 +92,7 @@ create a new file inside partials and name id alerts.blade.php.
     {{Session::get('info')}}
     </div>
 @endif
-``
+```
 Add the following code in you default page 
 ```
 @include('templates.partials.alerts')
