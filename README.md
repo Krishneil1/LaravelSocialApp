@@ -107,3 +107,92 @@ Refresh the page http://localhost:8000/alert and how you should see you alert me
 ```
 You have signed up!
 ```
+###User Table Creation/Migrations
+Creating user table.
+Navigate to .env file and edit as per your Database Design
+
+```
+APP_ENV=local
+APP_DEBUG=true
+APP_KEY=ruA9CAKRJCFgLOD1nc5o1BmvaTGokasi
+
+DB_HOST=localhost
+DB_DATABASE=chatty
+DB_USERNAME=
+DB_PASSWORD=
+
+CACHE_DRIVER=file
+SESSION_DRIVER=file
+QUEUE_DRIVER=sync
+
+MAIL_DRIVER=smtp
+MAIL_HOST=mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+```
+ On your command terminal enter the following:
+```
+php artisan make:migration create_users_table
+```
+This will create you users table migrations. 
+```
+public function up()
+    {
+        Schema::create ('users',function(Blueprint $table){
+            $table->increments('id');
+            $table->string('email');
+            $table->string('username');
+            $table->string('password');
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->string('location')->nullable();
+            $table->string('remember_token')->nullable();
+            $table->timestampe();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+   public function down()
+    {
+        //
+        Schema::drop('users');
+    }
+      
+```
+Next using the following command create your users table
+```
+php artisan migrate
+```
+ If you are using MySQL. Few changes to do if you get the following error;
+```
+[PDOException]
+  SQLSTATE[HY000] [1044] Access denied for user ''@'localhost' to database 'chatty'
+```
+Inside your config-> database.php file change the following section to be able to connect to the database.
+```
+
+        'mysql' => [
+            'driver'    => 'mysql',
+            'host'      => env('DB_HOST', 'localhost'),
+            'database'  => env('DB_DATABASE', 'chatty'),
+            'username'  => env('DB_USERNAME', 'root'),
+            'password'  => env('DB_PASSWORD'),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+            'strict'    => false,
+        ],
+
+```
+You also need to change the .env file
+```
+DB_HOST=localhost
+DB_DATABASE=chatty
+
+```
