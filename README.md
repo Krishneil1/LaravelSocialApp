@@ -1,3 +1,32 @@
+## Laravel PHP Framework
+
+[![Build Status](https://travis-ci.org/laravel/framework.svg)](https://travis-ci.org/laravel/framework)
+[![Total Downloads](https://poser.pugx.org/laravel/framework/d/total.svg)](https://packagist.org/packages/laravel/framework)
+[![Latest Stable Version](https://poser.pugx.org/laravel/framework/v/stable.svg)](https://packagist.org/packages/laravel/framework)
+[![Latest Unstable Version](https://poser.pugx.org/laravel/framework/v/unstable.svg)](https://packagist.org/packages/laravel/framework)
+[![License](https://poser.pugx.org/laravel/framework/license.svg)](https://packagist.org/packages/laravel/framework)
+
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as authentication, routing, sessions, queueing, and caching.
+
+Laravel is accessible, yet powerful, providing powerful tools needed for large, robust applications. A superb inversion of control container, expressive migration system, and tightly integrated unit testing support give you the tools you need to build any application with which you are tasked.
+
+## Official Documentation
+
+Documentation for the framework can be found on the [Laravel website](http://laravel.com/docs).
+
+## Contributing
+
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+
+### License
+
+The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+
+
 # LaravelSocialApp
 This is a tutorial app for project I am working on.
 
@@ -196,3 +225,159 @@ DB_HOST=localhost
 DB_DATABASE=chatty
 
 ```
+###Signing Up
+
+First, we will create a new Auth controller. app->Http->Controllers create a new file AuthController.php
+```
+namespace Chatty\Http\Controllers;
+use Illuminate\Http\Request; 
+
+class AuthController extends Controller
+{
+    public function getSignup()
+    {
+        //get request that displays the page
+        return view('auth.signup');
+    }
+    public function postSignup(Request $request)
+    {
+        //post the data through this
+    }
+}
+```
+use Illuminate\Http\Request; is built in Laravel to use $request.
+ creatte a new folder inside resources->views->auth and create a new file signup.blade.php.
+
+Next, add the route to this. Head to Http->routes.php and add the following code
+```
+Route::get('/signup',[
+    'uses'=>'\Chatty\Http\Controllers\AuthController@getSignup',
+    'as'=>'auth.signup',
+]);
+
+Route::post('/signup',[
+    'uses'=>'\Chatty\Http\Controllers\AuthController@postSignup',
+]);
+```
+Next add a signup form. create new folder auth in views and add file signup.blade.php
+```
+@extends('templates.default')
+
+@section('content')
+    <form class="form-vertical" role="form" method ="post" action="{{route('auth.signup')}}">
+        <div class="form-group{{$errors->has('email')? ' has-error': ''}}">
+            <label for="email" class="control-label">Your Email Address:</label>
+            <input type="email" class="form-control" id="email" placeholder="Enter email"name="email" value="{{Request::old('email')?:''}}">
+            @if($errors->has('email'))
+                <span class="help-block">{{$errors->first('email')}}</span>
+            @endif
+        </div>
+        <div class="form-group{{$errors->has('username')? ' has-error': ''}}">
+            <label for="username" class="control-label">Choose a Username</label>
+            <input type="text" class="form-control" id="username" placeholder="Enter Username"name="username" value="{{Request::old('username')?:''}}">
+            @if($errors->has('username'))
+                <span class="help-block">{{$errors->first('username')}}</span>
+            @endif
+        </div>
+        <div class="form-group{{$errors->has('password')? ' has-error': ''}}">
+            <label for="pwd">Choose a Password:</label>
+            <input type="password" class="form-control" id="password" name ="password" placeholder="Enter password">
+            @if($errors->has('password'))
+                <span class="help-block">{{$errors->first('password')}}</span>
+            @endif
+        </div>
+        <div class="checkbox">
+            <label><input type="checkbox"> Remember me</label>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Sign Up</button>
+        </div>
+        <input type="hidden" name="_token" value="{{ Session::token() }}">
+  </form>
+@stop
+```
+Modify the authController 
+```
+<?php
+
+namespace Chatty\Http\Controllers;
+use Illuminate\Http\Request;
+Use Chatty \Models\User;
+
+class AuthController extends Controller
+{
+    public function getSignup()
+    {
+        //get request that displays the page
+        return view('auth.signup');
+    }
+    public function postSignup(Request $request)
+    {
+        //post the data through this
+        $this->validate($request,[
+            'email'=>'required|unique:users|email|max:255',
+            'username'=>'required|unique:users|alpha_dash|max:20',
+            'password'=>'required|min:6',
+        ]);
+        
+        User::create([
+            'email'=>$request->input('email'),
+            'username'=>$request->input('username'),
+            'password'=>bcrypt($request->input('password')),
+        ]);
+
+        return redirect()
+            ->route('home')
+            ->with('info','Your account has been created and you can now sign in');
+    }
+}
+```
+####Model
+We are going to create a model inside app folder and delete the existing User.php model. Create a folder Models inside app
+````
+<?php
+
+namespace Chatty\Models;
+
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+
+class User extends Model implements AuthenticatableContract
+{
+    use Authenticatable;
+
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'users';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'username', 
+        'email', 
+        'password',
+        'first_name',
+        'last_name',
+        'location',
+        ];
+
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password', 
+        'remember_token'];
+}
+
+```
+
+You should now be able to sign up. At this timeline, we have covered the basic MVC. Model(E.g. User.php) , View(E.g.  Signup.blade.php) , Controller( E.g. AuthController) . However, Laravel goes a step further than MVC as you will need to provide routes. 
