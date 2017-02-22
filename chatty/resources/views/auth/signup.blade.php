@@ -1,6 +1,7 @@
 @extends('templates.default')
 
 @section('content')
+<h3> Join Us </h3>
     <form class="form-vertical" role="form" method ="post" action="{{route('auth.signup')}}">
         <div class="form-group{{$errors->has('email')? ' has-error': ''}}">
             <label for="email" class="control-label">Your Email Address:</label>
@@ -22,9 +23,6 @@
             @if($errors->has('password'))
                 <span class="help-block">{{$errors->first('password')}}</span>
             @endif
-        </div>
-        <div class="checkbox">
-            <label><input type="checkbox"> Remember me</label>
         </div>
         <div>
             <button type="submit" class="btn btn-primary">Sign Up</button>

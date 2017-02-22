@@ -333,8 +333,11 @@ class AuthController extends Controller
 }
 ```
 ####Model
+
 We are going to create a model inside app folder and delete the existing User.php model. Create a folder Models inside app
-````
+
+```
+
 <?php
 
 namespace Chatty\Models;
@@ -379,5 +382,121 @@ class User extends Model implements AuthenticatableContract
 }
 
 ```
-
 You should now be able to sign up. At this timeline, we have covered the basic MVC. Model(E.g. User.php) , View(E.g.  Signup.blade.php) , Controller( E.g. AuthController) . However, Laravel goes a step further than MVC as you will need to provide routes. 
+###Sign In
+Now that we have got our Sign up we need our users to be able to see in. Create Sign methods in your authController.
+```
+  public function getSignin()
+    {
+        return view('auth.signin');
+    }
+    public function postSignin(Request $request)
+    {
+        $this->validate($request, [
+            'email'=>'required',
+            'password'=>'required',
+        ]);
+
+        if(!Auth::attempt($request->only(['email','password']),$request->has('remember')))
+        {
+            return redirect()->back()->with('info','Could not sign you in with those details.');
+        }
+        return redirect()->route('home')->with('info','You are now Signed in.');
+    }
+```
+Next create your signin.blade.php file in your views->auth folder.
+
+```
+@extends('templates.default')
+
+@section('content')
+<h3> Sign In </h3>
+    <form class="form-vertical" role="form" method ="post" action="{{route('auth.signin')}}">
+        <div class="form-group">
+            <label for="email" class="control-label">Email:</label>
+            <input type="email" class="form-control" id="email" placeholder="Enter email"name="email" value="{{Request::old('email')?:''}}">
+            @if($errors->has('email'))
+                <span class="help-block">{{$errors->first('email')}}</span>
+            @endif
+        </div>
+        <div class="form-group{{$errors->has('password')? ' has-error': ''}}">
+            <label for="pwd">Password:</label>
+            <input type="password" class="form-control" id="password" name ="password" placeholder="Enter password">
+            @if($errors->has('password'))
+                <span class="help-block">{{$errors->first('password')}}</span>
+            @endif
+        </div>
+        <div class="checkbox">
+            <label><input type="checkbox"> Remember me</label>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Sign in</button>
+        </div>
+        <input type="hidden" name="_token" value="{{ Session::token() }}">
+  </form>
+@stop
+```
+You also need to update your routes .
+```
+/*Signin Routes*/
+Route::get('/signin',[
+    'uses'=>'\Chatty\Http\Controllers\AuthController@getSignin',
+    'as'=>'auth.signin',
+]);
+
+Route::post('/signin',[
+    'uses'=>'\Chatty\Http\Controllers\AuthController@postSignin',
+]);
+```
+You also need to use Auth built in library for Laravel. 
+###Implementing the User's Name
+
+In your user model  create following  methods
+```
+```
+###SignOut 
+
+In your auth controller implement a sign out method.
+
+```
+public function getSignout()
+    {
+        Auth::logout();
+        return redirect()->route('home');
+    }
+```
+update navigation page
+```
+<nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="{{route('home')}}">Chatty</a>
+    </div>
+    <div class="collapse navbar-collapse">
+        @if (Auth::check())
+            <ul class="nav navbar-nav">
+                <li><a href="#">Timeline</a></li>
+                <li><a href="#">Friends</a></li>
+            </ul>
+            <form class="navbar-form navbar-left" role="search" action="#">
+                <div class ="form-group">
+                    <input type ="text" name="query" class="form-control" placeholder ="Find People">
+                </div>
+                <button class="btn btn-success" type="submit">Search</button>
+            </form>
+        @endif
+            <ul class="nav navbar-nav navbar-right">
+                @if (Auth::check())    
+                    <li><a href ="{{Auth::user()->getNameOrUsername()}}">{{Auth::user()->getNameOrUsername()}}</a></li>
+                    <li><a href="#">Update profile</a></li>
+                    <li><a href="{{route('auth.signout')}}">Sign Out</a></li>
+                @else
+                    <li><a href="{{route('auth.signup')}}"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                    <li><a href="{{route('auth.signin')}}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                @endif
+            </ul>
+    </div>
+  </div>
+</nav>
+```
+

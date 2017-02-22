@@ -26,7 +26,7 @@ Route::get('/alert',function(){
 /***
 *Authentication
 */
-
+/*Signup Routes*/
 Route::get('/signup',[
     'uses'=>'\Chatty\Http\Controllers\AuthController@getSignup',
     'as'=>'auth.signup',
@@ -34,4 +34,20 @@ Route::get('/signup',[
 
 Route::post('/signup',[
     'uses'=>'\Chatty\Http\Controllers\AuthController@postSignup',
+]);
+
+/*Signin Routes*/
+Route::get('/signin',[
+    'uses'=>'\Chatty\Http\Controllers\AuthController@getSignin',
+    'as'=>'auth.signin',
+]);
+
+Route::post('/signin',[
+    'uses'=>'\Chatty\Http\Controllers\AuthController@postSignin',
+]);
+
+/*Sign Out*/
+Route::get('/signout',[
+    'uses'=>'\Chatty\Http\Controllers\AuthController@getSignout',
+    'as'=>'auth.signout',
 ]);
