@@ -500,3 +500,63 @@ update navigation page
 </nav>
 ```
 
+###Searching for People
+
+First, sign up for some account.(Make sure you remember the password).
+Create a search controller.
+```
+<?php
+
+namespace Chatty\Http\Controllers;
+
+class SearchController extends Controller
+{
+    public function getResults()
+    {
+        return view ('search.results');
+    }
+}
+```
+Now create a view. Create folder search in resources and create a file result.blade.php
+```
+@extends('templates.default')
+
+@section('content')
+    <h3> Your search for "{{ Request::input('query') }}"</h3>
+
+    @if (!$users->count())
+        <p>No results found, sorry. </p>
+    @else
+        <div class="row">
+            <div class="col-lg-12">
+                @foreach($users as $user)
+                    @include('user/partials/userblock')
+                @endforeach            
+            </div>
+        </div>
+    @endif
+@stop
+```
+Next, create a route
+```
+Route::get ('/search',[
+    'uses'=>'\Chatty\Http\Controllers\SearchController@getResults',
+    'as'=>'search.results',
+]);
+```
+Lets hook the navigation so in your navigation folder edit the following code
+```
+<form class="navbar-form navbar-left" role="search" action="{{route('search.results')}}">
+```
+
+Next, create a user view. create folder User and then create folder partials. Create a new file userblock.blade.php
+```
+<div class="media">
+    <a class="pull-left" href="#">
+        <img class="media-object" alt="" src="">
+    </a>
+    <div class="media-body">
+        <h4 class="media-heading"><a href="#">Dayle</a></h4>
+    </div>
+</div>
+```
