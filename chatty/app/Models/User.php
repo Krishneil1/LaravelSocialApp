@@ -39,7 +39,7 @@ class User extends Model implements AuthenticatableContract
     protected $hidden = [
         'password', 
         'remember_token'];
-    public function getName()
+    public function getName()/* Gets Name*/
     {
         if($this->first_name && $this->last_name)
         {
@@ -57,6 +57,11 @@ class User extends Model implements AuthenticatableContract
     }
     public function getFirstNameOrUsername()
     {
-        return $this->first_name ? : $this->username;
+        return $this->first_name ? : $this->username;/*Gets First or Last Name*/
+    }
+
+    public function getAvatarUrl()
+    {
+        return "https://www.gravatar.com/avatar/{{ md5($this->email) }}?d=mm&s=40";/*Sets the avatat of peope*/
     }
 }
