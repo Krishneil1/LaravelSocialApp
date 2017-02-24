@@ -563,3 +563,12 @@ Next, create a user view. create folder User and then create folder partials. Cr
     </div>
 </div>
 ```
+###Profile Pictures
+
+For this, we will be using Gravatar lots of website use this for profile pics. The easiest way of doing this implementing a method in User Model.
+```
+public function getAvatarUrl()
+    {
+        return "https://www.gravatar.com/avatar/{{md5($this->email)}}";
+    }
+```
