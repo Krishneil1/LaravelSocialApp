@@ -587,3 +587,101 @@ Also update userblock view
     </div>
 </div>
 ```
+###User Profile
+
+First, we create a Profile controller i.e ProfileController.php
+
+```
+class ProfileController extends Controller
+{
+    public function getProfile($username)
+    {
+        $user = User::where('username',$username)->first();
+        if (!$user)
+        {
+            abort(404);
+        }
+        return view('profile.index');
+    }
+}
+```
+
+Implement the controller in routes
+```
+/**
+*Profile
+*/
+Route::get('/user/{username}',[
+    'uses'=>'\Chatty\Http\Controllers\ProfileController@getProfile',
+    'as'=>'profile.index',
+]);
+```
+
+Hook this to the view
+```
+<div class="media">
+    <a class="pull-left" href="{{ route('profile.index',['username'=>$user->username]) }}">
+        <img class="media-object" alt="{{ $user->getNameOrUsername ()}}" src="{{ $user->getAvatarUrl()}}">
+        
+    </a>
+    <div class="media-body">
+        <h4 class="media-heading"><a href="{{ route('profile.index',['username'=>$user->username]) }}">{{ $user->getNameOrUserName() }}</a></h4>
+        @if ($user->location)
+            <p>{{ $user->location }}</p>
+        @endif
+    </div>
+</div>
+```
+
+Next, we create a new view. Create folder in resources->profile  and add file index.blade.php
+
+```
+
+@extends('templates.default')
+
+@section('content')
+    <div class="row">
+        <div class="col-lg-5">
+            <!--User information and status-->
+        </div>
+        <div class="col-lg-4 col-lg-offset-3">
+            <!--Friends, and friends request-->
+        </div>
+    </div>
+@stop
+```
+Update you navigation.blade.php. 
+```
+<nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="{{route('home')}}">Chatty</a>
+    </div>
+    <div class="collapse navbar-collapse">
+        @if (Auth::check())
+            <ul class="nav navbar-nav">
+                <li><a href="#">Timeline</a></li>
+                <li><a href="#">Friends</a></li>
+            </ul>
+            <form class="navbar-form navbar-left" role="search" action="{{route('search.results')}}">
+                <div class ="form-group">
+                    <input type ="text" name="query" class="form-control" placeholder ="Find People">
+                </div>
+                <button class="btn btn-success" type="submit">Search</button>
+            </form>
+        @endif
+            <ul class="nav navbar-nav navbar-right">
+                @if (Auth::check())    
+                    <li><a href ="{{ route('profile.index', ['username'=>Auth::user()->username]) }}">{{Auth::user()->getNameOrUsername()}}</a></li>
+                    <li><a href="#">Update profile</a></li>
+                    <li><a href="{{route('auth.signout')}}">Sign Out</a></li>
+                @else
+                    <li><a href="{{route('auth.signup')}}"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                    <li><a href="{{route('auth.signin')}}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                @endif
+            </ul>
+    </div>
+  </div>
+</nav>
+```
+now when you click your username you should be able to see your profile
