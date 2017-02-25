@@ -68,7 +68,21 @@ Route::get ('/search',[
 /**
 *Profile
 */
+//index profile(index method)
 Route::get('/user/{username}',[
     'uses'=>'\Chatty\Http\Controllers\ProfileController@getProfile',
     'as'=>'profile.index',
+]);
+
+//update profile(edit method)
+
+Route::get('/profile/edit',[
+    'uses'=>'\Chatty\Http\Controllers\ProfileController@getEdit',
+    'as'=>'profile.edit',
+    'middleware'=>['auth'],//middleware'=>['auth'] will allow only signed users to make changes
+]);
+
+Route::post('/profile/edit',[
+    'uses'=>'\Chatty\Http\Controllers\ProfileController@postEdit',
+    'middleware'=>['auth'],//middleware'=>['auth'] will allow only signed users to make changes
 ]);
