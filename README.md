@@ -685,3 +685,86 @@ Update you navigation.blade.php.
 </nav>
 ```
 now when you click your username you should be able to see your profile
+###Updating Profile Information
+Add functions in you profile controller
+```
+   public function postEdit(Request $request)
+    {   // the First argument is the data and second is array of options field you can include as many fields you like
+        $this->validate($request,[
+            'first_name'=>'alpha|max:50',
+            'first_name'=>'alpha|max:50',
+            'location'=>'max:25',
+        ]);
+        Auth:: user()->update([
+            'first_name' => $request->input('first_name'),
+            'last_name' => $request->input('last_name'),
+            'location' => $request->input('location'),
+        ]);
+        return  redirect()
+            ->route('profile.edit')
+            ->with('info','Your profile has been updated.');
+    }
+```
+Now add edit view in your views profile folder i.e edit.blade.php
+```
+
+@extends('templates.default')
+
+@section('content')
+    <h3> Update your profile</h3>
+    <div class="row">
+        <div class="col-lg-6">
+            <form class="form-vertical" role="form" method="post" action="{{route ('profile.edit')}}">
+                <div class="row">
+                    <!--edit First Name-->
+                    <div class="col-lg-6"> 
+                        <div class="form-group">
+                            <label for="first_name" class="control-label">First Name: <label>
+                            <input type ="text" name="first_name" class="form-control" id="first_name" value="{{ Request::old('first_name') ?: Auth::user()->first_name }}"> <!--value old data from db-->
+                        </div>
+                    </div>
+                    <!--edit Last Name-->
+                    <div class="col-lg-6"> 
+                        <div class="form-group">
+                            <label for="last_name" class="control-label">Last Name: <label>
+                            <input type ="text" name="last_name" class="form-control" id="last_name" value="{{ Request::old('last_name') ?: Auth::user()->last_name }}">
+                        </div>
+                    </div>
+                    <!--edit Location-->
+                    <div class="col-lg-6"> 
+                        <div class="form-group">
+                            <label for="Location" class="control-label">Location: <label>
+                            <input type ="text" name="Location" class="form-control" id="location" value="{{ Request::old('location') ?: Auth::user()->location }}">
+                        </div>
+                    </div>
+                    <!--edit button-->
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-info">Update</button>
+                    </div>
+                </div>
+                <input type="hidden" name="_token" value="{{ Session::token() }}">
+            </form>
+        </div> 
+    </div>
+@stop
+```
+update routes
+```
+//update profile(edit method)
+
+Route::get('/profile/edit',[
+    'uses'=>'\Chatty\Http\Controllers\ProfileController@getEdit',
+    'as'=>'profile.edit',
+    'middleware'=>['auth'],//middleware'=>['auth'] will allow only signed users to make changes
+]);
+
+Route::post('/profile/edit',[
+    'uses'=>'\Chatty\Http\Controllers\ProfileController@postEdit',
+    'middleware'=>['auth'],//middleware'=>['auth'] will allow only signed users to make changes
+]);
+```
+update you navigation.blade.php
+
+```
+<li><a href="{{route ('profile.edit')}}">Update profile</a></li>
+```
