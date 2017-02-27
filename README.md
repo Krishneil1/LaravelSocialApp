@@ -768,3 +768,36 @@ update you navigation.blade.php
 ```
 <li><a href="{{route ('profile.edit')}}">Update profile</a></li>
 ```
+###Friend table migration
+create a new migrations
+```
+php artisan make:migration create_friends_table
+```
+in the new file inside database -> migrations '2017_02_27_080721_create_friends_table.php'
+edit the file
+```
+ public function up()
+    {
+        Schema::create ('friends',function(Blueprint $table){
+            $table->increments('id');
+            $table->integer('user_id');
+            $table->integer('friend_id');
+            $table->boolean('accepted');//same as tiny int in SQL
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        //
+        Schema::drop('users');
+    }
+```
+in you console enter the following command
+```
+php artisan migrate
