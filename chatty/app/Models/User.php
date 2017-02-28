@@ -64,4 +64,20 @@ class User extends Model implements AuthenticatableContract
     {
         return "https://www.gravatar.com/avatar/{{ md5($this->email) }}?d=mm&s=40";/*Sets the avatat of peope*/
     }
+    public function friendsOfMine()
+    {
+        return $this->belongsToMany('Chatty\Models\User','friends','user_id','friend_id');//friend is pivot table
+    }
+    public function friendOf()
+    {
+        return $this->belongsToMany('Chatty\Models\User','friends','friend_id','user_id');//friend is pivot table
+    }
+    public function friends()
+    {
+        return $this->friendsOfMine()
+                    ->wherePivot('accepted',true)
+                    ->get()//collection
+                    ->merge($this->friendOf()//This is done to create two way relationship Alex friends with Dale and Dale friends with Alex even though Alex add Dale as a Friend
+                    ->wherePivot('accepted','true')->get());
+    }
 }
