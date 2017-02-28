@@ -801,3 +801,51 @@ edit the file
 in you console enter the following command
 ```
 php artisan migrate
+```
+###Showing Friends
+
+create the following methods in your user model
+```
+public function friendsOfMine()
+    {
+        return $this->belongsToMany('Chatty\Models\User','friends','user_id','friend_id');//friend is pivot table
+    }
+    public function friendOf()
+    {
+        return $this->belongsToMany('Chatty\Models\User','friends','friend_id','user_id');//friend is pivot table
+    }
+    public function friends()
+    {
+        return $this->friendsOfMine()
+                    ->wherePivot('accepted',true)
+                    ->get()//collection
+                    ->merge($this->friendOf()//This is done to create two way relationship Alex friends with Dale and Dale friends with Alex even though Alex add Dale as a Friend
+                    ->wherePivot('accepted','true')->get());
+    }
+```
+change your profile index.blade.php page
+```
+<div class="col-lg-4 col-lg-offset-3">
+            
+@extends('templates.default')
+
+@section('content')
+    <div class="row">
+        <div class="col-lg-5">
+            @include('user.partials.userblock')
+            <hr>
+        </div>
+        <div class="col-lg-4 col-lg-offset-3">
+            <h4>{{ $user->getFirstNameOrUsername() }}'s friends.</h4>
+            @if (!$user->friends()->count())
+                <p>{{ $user->getFirstNameOrUsername()}} has no friends</p>
+            @else
+                @foreach ($user->friends() as $user)
+                    @include('user/partials/userblock')
+                @endforeach
+            @endif
+        </div>
+    </div>
+@stop
+</div>
+```
