@@ -86,3 +86,11 @@ Route::post('/profile/edit',[
     'uses'=>'\Chatty\Http\Controllers\ProfileController@postEdit',
     'middleware'=>['auth'],//middleware'=>['auth'] will allow only signed users to make changes
 ]);
+/**
+*Friends
+*/
+Route::get('/friends',[
+    'uses'=>'\Chatty\Http\Controllers\FriendController@getIndex',
+    'as'=>'friend.index',
+    'middleware'=>['auth'],//middleware'=>['auth'] will allow only signed users to see friends
+]);
