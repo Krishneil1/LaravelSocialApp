@@ -80,4 +80,8 @@ class User extends Model implements AuthenticatableContract
                     ->merge($this->friendOf()//This is done to create two way relationship Alex friends with Dale and Dale friends with Alex even though Alex add Dale as a Friend
                     ->wherePivot('accepted','true')->get());
     }
+    public function friendRequests()
+    {
+        return $this->friendsOfMine()->wherePivot('accepted',false)->get();
+    }
 }
