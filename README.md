@@ -905,3 +905,57 @@ update the navigation page
 ```
 <li><a href="{{ route ('friend.index') }}">Friends</a></li>
 ```
+###Showing Friends Requests
+
+Add new method in user model
+
+```
+    public function friendRequests()
+    {
+        return $this->friendsOfMine()->wherePivot('accepted',false)->get();
+    }
+```
+update your friend controller
+```
+class FriendController extends Controller
+{
+    public function getIndex()
+    {
+        $friends = Auth::user()->friends();
+        $requests = Auth::user()->friendRequests();
+
+        return view('friend.index')
+            ->with('friends',$friends)
+            ->with('requests',$requests);
+    }
+}
+```
+update your friend index
+```
+@extends('templates.default')
+
+@section('content')
+    <div class="row">
+        <div class="col-lg-6">
+            <h3>Your Friends</h3>
+            @if (!$friends->count())
+                <p>Its lonely in here :( You have no friends</p>
+            @else
+                @foreach ($friends as $user)
+                    @include('user/partials/userblock')
+                @endforeach
+            @endif
+        </div>
+        <div class="col-lg-6">
+            <h3>Friends Request</h3>
+            @if (!$requests->count())
+                <p>You have no friend request./p>
+            @else
+                @foreach ($requests as $user)
+                    @include('user.partials.userblock')
+                @endforeach
+            @endif
+        </div>
+    </div>
+@stop
+```
