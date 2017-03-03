@@ -959,3 +959,76 @@ update your friend index
     </div>
 @stop
 ```
+###Friend model methods
+update your user model
+```
+  public function friendRequests()
+    {
+        return $this->friendsOfMine()->wherePivot('accepted',false)->get();
+    }
+    public function friendRequestsPending()
+    {
+        return $this->friendOf()->wherePivot('accepted',false)->get();
+    }
+    public function hasFriendRequestPending(User $user)
+    {
+        return(bool) $this->friendRequestsPending()->where('id',$user->id)->count();
+    }
+    public function hasFriendRequestReceived(User $user)
+    {
+        return(bool) $this->friendRequests()->where('id',$user->id)->count();
+    }
+    public function addFriend(User $user)
+    {
+        $this->friendOf()->attach($user->id);
+    }
+    public function acceptFriendRequest(user $user)
+    {
+        $this->friendRequests()->where('id',$user->id)->first()->pivot->
+        update([
+            'accepted'=>true,
+        ]);
+    }
+    public function isFriendsWith(User $user)
+    {
+        return(bool) $this->friends()->where('id',$user->id)->count();
+    }
+```
+ than duplicating the function I am just putting this inside my model and this makes it lot easier to work with. 
+
+update your view . view->profel->index
+```
+
+@extends('templates.default')
+
+@section('content')
+    <div class="row">
+        <div class="col-lg-5">
+            @include('user.partials.userblock')
+            <hr>
+        </div>
+        <div class="col-lg-4 col-lg-offset-3">
+            @if(Auth::user()->hasFriendRequestPending($user))
+                <p>Waiting for {{ $user->getNameOrUsername() }} to accept your request. </p>
+            
+            @elseif(Auth::user()->hasFriendRequestReceived($user))
+                <a href="#" class="btn btn-primary">Accept friend Request</a>
+            
+            @elseif(Auth::user()->isFriendsWith($user))
+                <p>You and {{ $user->getNameOrUsername() }} are friends. </p>
+            @else
+            <a href="#" class="btn btn-info">Add as friend</a>
+            @endif
+            <h4>{{ $user->getFirstNameOrUsername() }}'s friends.</h4>
+            @if (!$user->friends()->count())
+                <p>{{ $user->getFirstNameOrUsername()}} has no friends</p>
+            
+            @else
+                @foreach ($user->friends() as $user)
+                    @include('user/partials/userblock')
+                @endforeach
+            @endif
+        </div>
+    </div>
+@stop
+```
