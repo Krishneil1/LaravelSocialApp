@@ -1032,3 +1032,4 @@ update your view . view->profel->index
     </div>
 @stop
 ```
+###Sending friend requests
