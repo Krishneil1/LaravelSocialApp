@@ -1033,3 +1033,52 @@ update your view . view->profel->index
 @stop
 ```
 ###Sending friend requests
+We need a method inside our friend's controller
+```
+public functions getAdd($username)
+    {
+         $user = User::where('username',$username)->first();
+
+        if (!$user)
+        {
+            return redirect()
+                ->route('home')
+                ->with('info','That user count not be found');
+        }
+
+        if (Auth::user()-> hasFriendRequestPending($user)||$user->
+            hasFriendRequestPending(Auth::user()))
+            {
+                return redirect()
+                    ->route('profile.index',['username'=>$user->username])
+                    ->with('info','Friend request already pending');
+            }
+
+        if (Auth::user()-> isFriendsWith($user))
+        {
+            return redirect()
+                    ->route('profile.index',['username'=>$user->username])
+                    ->with('info','Already Friends');
+        }
+        Auth::user()->addFriend($user);
+
+        return redirect()
+            ->route('profile.index',['username'=>$username])
+            ->with('info','Friend request sent.');
+    }
+```
+
+let's route this
+```
+Route::get('/friends/add/{username}',[
+    'uses'=>'\Chatty\Http\Controllers\FriendController@getAdd',
+    'as'=>'friend.add',//you got a method as in getAdd
+    'middleware'=>['auth'],//middleware'=>['auth'] will allow only signed users to see friends
+]);
+```
+
+Hook up the controller to a profile index view
+```
+<a href="{{ route('friend.add',['username'=>$user->username]) }}" class="btn btn-info">Add as friend</a>
+            
+```
