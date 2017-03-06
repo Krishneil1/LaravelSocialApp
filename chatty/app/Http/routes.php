@@ -94,3 +94,9 @@ Route::get('/friends',[
     'as'=>'friend.index',
     'middleware'=>['auth'],//middleware'=>['auth'] will allow only signed users to see friends
 ]);
+
+Route::get('/friends/add/{username}',[
+    'uses'=>'\Chatty\Http\Controllers\FriendController@getAdd',
+    'as'=>'friend.add',//you got a method as in getAdd
+    'middleware'=>['auth'],//middleware'=>['auth'] will allow only signed users to see friends
+]);
