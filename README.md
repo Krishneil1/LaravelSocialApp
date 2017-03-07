@@ -1119,3 +1119,48 @@ hook this to our view
                 <a href="{{ route ('friend.Accept',['username'=>$user->username]) }}" class="btn btn-primary">Accept friend Request</a>
             
 ```
+##Showing the timeline page
+
+Go to Home controller and create a different view of the user is signed in. 
+```
+<?php
+
+namespace Chatty\Http\Controllers;
+
+class HomeController extends Controller
+{
+    public function index()
+    {
+        if(Auth::check())
+        {
+            return view('timeline.index');
+        }
+        return view ('home');
+    }
+}
+```
+create new view. create folder timeline->index.blade.php
+```
+@extends('templates.default')
+
+@section('content')
+    <div class="row">
+        <div class="col-lg-6">
+            <form role="form" action="#" method="post">
+                <div class="form-group">
+                    <textarea placeholder="What's on your mind?"name="status"
+                    class="form-control" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-default">Update status</button>
+            </form>
+            <hr>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-5">
+        <!--Timeline statuses and replies-->
+        </div>
+    </div>
+@stop
+```
