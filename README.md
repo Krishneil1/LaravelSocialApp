@@ -1082,3 +1082,40 @@ Hook up the controller to a profile index view
 <a href="{{ route('friend.add',['username'=>$user->username]) }}" class="btn btn-info">Add as friend</a>
             
 ```
+###Accept Friend
+Create the following function in your friends controller.
+public function getAccept($username)//accept friend request
+    {
+        $user = User::where('username',$username)->first();
+
+        if (!$user)//check to see if the user exits
+        {
+            return redirect()
+                ->route('home')
+                ->with('info','That user count not be found');
+        }
+        if (!Auth::user()->hasFriendRequestReceived($user)) 
+        {
+            return redirect()->route('home');
+        }
+        Auth::user()->acceptFriendRequest($user);
+        return redirect()
+            ->route('profile.index',['username'=>$username])
+            ->with('info','Friend request accepted.');
+    }
+}
+ head over to routes and implement the following routes.
+
+Route::get('/friends/accept/{username}',[
+    'uses'=>'\Chatty\Http\Controllers\FriendController@getAccept',
+    'as'=>'friend.Accept',//you got a method as in getAdd
+    'middleware'=>['auth'],//middleware'=>['auth'] will allow only signed users to see friends
+]);
+
+hook this to our view
+
+```
+ @elseif(Auth::user()->hasFriendRequestReceived($user))
+                <a href="{{ route ('friend.Accept',['username'=>$user->username]) }}" class="btn btn-primary">Accept friend Request</a>
+            
+```
