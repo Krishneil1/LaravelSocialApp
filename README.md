@@ -1164,3 +1164,52 @@ create new view. create folder timeline->index.blade.php
     </div>
 @stop
 ```
+###Status table migration
+Lets create the status table.  Run the following command in your window. 
+```
+php artisan make:migration create_statuses_table
+```
+open the 2017_03_07_073225_create_statuses_table.php file and create your table
+```
+<?php
+
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateStatusesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        //
+        Schema::create('statuses',function(Blueprint $table)
+        {
+            $table->increments('id');
+            $table->integer('user_id');
+            $table->integer('parent_id')->nullable();
+            $table->text('body');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        //
+        Schema::drop('statuses');
+    }
+}
+
+```
+Now run the migration and this will create our table
+```
+php artisan migrate
+```
